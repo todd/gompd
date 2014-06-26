@@ -1,2 +1,3 @@
-libmpdclient-go
+gompd
 ===============
+:dog::cow:
