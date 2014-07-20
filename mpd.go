@@ -10,42 +10,41 @@ import "C"
 
 import (
 	"unsafe"
+	"errors"
 )
 
 type Client struct {
-	Connection connection
-}
-
-type connection struct {
-	connection   *C.struct_mpd_connection
-	ErrorMessage string
+	connection *C.struct_mpd_connection
 }
 
 type Status struct {
 	Status *C.struct_mpd_status
 }
 
-func InitClient(host string, port int, timeoutMS int) (mpd Client) {
+func Init(host string, port int, timeoutMS int) (mpd Client, err error) {
 	chost := C.CString(host)
 	cport := C.uint(port)
 	ctimeoutMS := C.uint(timeoutMS)
 
-	connection, _ := C.mpd_connection_new(chost, cport, ctimeoutMS)
+	connection, err := C.mpd_connection_new(chost, cport, ctimeoutMS)
 
 	C.free(unsafe.Pointer(chost))
 
-	if connection != nil {
-		mpd.Connection.connection = connection
+	connection_error := C.mpd_connection_get_error(connection)
+
+	if connection_error == 0 {
+		mpd.connection = connection
+		return mpd, nil
 	} else {
-		errorMessage := C.mpd_connection_get_error_message(connection)
-		mpd.Connection.ErrorMessage = C.GoString(errorMessage)
+		error_message := C.mpd_connection_get_error_message(connection)
+		err = errors.New(C.GoString(error_message))
 	}
 
 	return
 }
 
 func (mpd Client) Status() (status Status, cerr error) {
-	mpdStatus, cerr := C.mpd_run_status(mpd.Connection.connection)
+	mpdStatus, cerr := C.mpd_run_status(mpd.connection)
 
 	status.Status = mpdStatus
 	return
@@ -58,5 +57,5 @@ func (status Status) GetSongID() (id int, cerr error) {
 }
 
 func (mpd Client) Close() {
-	C.mpd_connection_free(mpd.Connection.connection)
+	C.mpd_connection_free(mpd.connection)
 }
