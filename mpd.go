@@ -9,8 +9,8 @@ package mpd
 import "C"
 
 import (
-	"unsafe"
 	"errors"
+	"unsafe"
 )
 
 type Client struct {
@@ -43,7 +43,7 @@ func Init(host string, port int, timeoutMS int) (mpd Client, err error) {
 	return
 }
 
-func (mpd Client) Status() (status Status, cerr error) {
+func (mpd Client) GetStatus() (status Status, cerr error) {
 	mpdStatus, cerr := C.mpd_run_status(mpd.connection)
 
 	status.Status = mpdStatus
@@ -56,6 +56,21 @@ func (status Status) GetSongID() (id int, cerr error) {
 	return
 }
 
+func (mpd Client) GetCurrentSong() (song Song, cerr error) {
+	mpdSong, cerr := C.mpd_run_current_song(mpd.connection)
+	song.cSong = mpdSong
+	song.Artist, _ = song.getArtist()
+	song.Album, _ = song.getAlbum()
+	song.Title, _ = song.getTitle()
+	song.Track, _ = song.getTrack()
+	song.Name, _ = song.getName()
+	return
+}
+
 func (mpd Client) Close() {
 	C.mpd_connection_free(mpd.connection)
+}
+
+func (status Status) StatusFree() {
+	C.mpd_status_free(status.Status)
 }

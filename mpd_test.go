@@ -1,9 +1,9 @@
 package mpd
 
 import (
-	"testing"
 	"os"
 	"strconv"
+	"testing"
 )
 
 var host = "localhost"
