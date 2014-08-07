@@ -10,5 +10,6 @@ before_install:
   - sudo wget http://www.vorbis.com/music/Lumme-Badloop.ogg -O /var/lib/mpd/music/lumme.ogg
   - mpc update
   - mpc ls | mpc add
+  - mpc play && mpc pause
 
 cache: apt
