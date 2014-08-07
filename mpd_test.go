@@ -31,3 +31,15 @@ func TestClientInit(t *testing.T) {
 		client.Close()
 	}
 }
+
+func TestGetCurrentSong(t *testing.T) {
+  client, _ := Init(host, port, timeoutms)
+
+  if song, err := client.GetCurrentSong(); err != nil {
+    t.Errorf("GetCurrentSong failed: %v", err)
+  } else {
+    if song.Artist != "Kenny Beltrey" && song.Title != "Hydrate - Kenny Beltrey" {
+      t.Fail()
+    }
+  }
+}
