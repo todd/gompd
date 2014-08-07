@@ -5,6 +5,10 @@ go:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -y mpd libmpdclient2 libmpdclient-dev
+  - sudo apt-get install -y mpd mpc libmpdclient2 libmpdclient-dev
+  - sudo wget http://www.vorbis.com/music/Hydrate-Kenny_Beltrey.ogg -O /var/lib/mpd/music/hydrate.ogg
+  - sudo wget http://www.vorbis.com/music/Lumme-Badloop.ogg -O /var/lib/mpd/music/lumme.ogg
+  - mpc update
+  - mpc ls | mpc add
 
 cache: apt
