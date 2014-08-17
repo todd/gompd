@@ -17,10 +17,6 @@ type Client struct {
 	connection *C.struct_mpd_connection
 }
 
-type Status struct {
-	cStatus *C.struct_mpd_status
-}
-
 func Init(host string, port int, timeoutMS int) (mpd Client, err error) {
 	chost := C.CString(host)
 	cport := C.uint(port)
@@ -50,12 +46,6 @@ func (mpd Client) GetStatus() (status Status, cerr error) {
 	return
 }
 
-func (status Status) GetSongID() (id int, cerr error) {
-	cid, cerr := C.mpd_status_get_song_id(status.cStatus)
-	id = int(cid)
-	return
-}
-
 func (mpd Client) GetCurrentSong() (song Song, cerr error) {
 	mpdSong, cerr := C.mpd_run_current_song(mpd.connection)
 	song.cSong = mpdSong
@@ -69,8 +59,4 @@ func (mpd Client) GetCurrentSong() (song Song, cerr error) {
 
 func (mpd Client) Close() {
 	C.mpd_connection_free(mpd.connection)
-}
-
-func (status Status) StatusFree() {
-	C.mpd_status_free(status.cStatus)
 }
