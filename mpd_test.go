@@ -42,4 +42,6 @@ func TestGetCurrentSong(t *testing.T) {
       t.Fail()
     }
   }
+
+  client.Close()
 }
