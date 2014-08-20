@@ -18,6 +18,6 @@ func (status Status) GetSongID() (id int, cerr error) {
 	return
 }
 
-func (status Status) StatusFree() {
+func (status Status) Free() {
 	C.mpd_status_free(status.cStatus)
 }
