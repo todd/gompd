@@ -57,6 +57,12 @@ func (mpd Client) GetCurrentSong() (song Song, cerr error) {
 	return
 }
 
+func (mpd Client) Play() (success bool, cerr error) {
+	cSuccess, cerr := C.mpd_send_play(mpd.connection)
+	success = bool(cSuccess)
+	return
+}
+
 func (mpd Client) Close() {
 	C.mpd_connection_free(mpd.connection)
 }
