@@ -1,33 +1,58 @@
-package mpd
+package mpd_test
 
 import (
-	"os"
-	"strconv"
-	"testing"
+	. "github.com/todd/gompd"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+
+	"reflect"
 )
 
-var host = "localhost"
-var port = 0
-var timeoutms = 0
+var _ = Describe("Mpd", func() {
+	Describe("Initializing MPD Client", func() {
+		It("returns a client", func() {
+			client, err := Init(host, port, timeoutms)
+			Expect(err).ToNot(HaveOccurred())
+			client.Close()
+		})
+	})
 
-func init() {
-	if env_host := os.Getenv("GOMPD_HOST"); env_host != "" {
-		host = env_host
-	}
+	Context("With initialized client", func() {
+		var client Client
 
-	if env_port := os.Getenv("GOMPD_PORT"); env_port != "" {
-		port, _ = strconv.Atoi(env_port)
-	}
+		BeforeEach(func() {
+			client, _ = Init(host, port, timeoutms)
+		})
 
-	if env_timeout_ms := os.Getenv("GOMPD_TIMEOUTMS"); env_timeout_ms != "" {
-		timeoutms, _ = strconv.Atoi(env_timeout_ms)
-	}
-}
+		AfterEach(func() {
+			client.Close()
+		})
 
-func TestClientInit(t *testing.T) {
-	if client, err := Init(host, port, timeoutms); err != nil {
-		t.Errorf("Init failed: %v", err)
-	} else {
-		client.Close()
-	}
-}
+		Describe("Getting the current song", func() {
+			Context("With currently playing song", func() {
+				It("returns the currently playing song", func() {
+					song, err := client.GetCurrentSong()
+
+					Expect(err).ToNot(HaveOccurred())
+					Expect(song.Artist).To(Equal("Kenny Beltrey"))
+					Expect(song.Title).To(Equal("Hydrate - Kenny Beltrey"))
+					song.Free()
+				})
+			})
+		})
+
+		Describe("Getting the current status", func() {
+			Context("With the current status", func() {
+				It("returns the current status", func() {
+					status, err := client.GetStatus()
+					objectType := reflect.TypeOf(status)
+
+					Expect(err).ToNot(HaveOccurred())
+					Expect(objectType.String()).To(Equal("mpd.Status"))
+					status.Free()
+				})
+			})
+		})
+	})
+})

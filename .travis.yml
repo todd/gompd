@@ -6,9 +6,25 @@ go:
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y mpd mpc libmpdclient2 libmpdclient-dev
-  - sudo wget http://www.vorbis.com/music/Hydrate-Kenny_Beltrey.ogg -O /var/lib/mpd/music/hydrate.ogg
-  - sudo wget http://www.vorbis.com/music/Lumme-Badloop.ogg -O /var/lib/mpd/music/lumme.ogg
+  - sudo wget http://www.vorbis.com/music/Hydrate-Kenny_Beltrey.ogg -O /var/lib/mpd/music/Hydrate-Kenny_Beltrey.ogg
+  - sudo wget http://www.vorbis.com/music/Lumme-Badloop.ogg -O /var/lib/mpd/music/Lumme-Badloop.ogg
   - mpc update
   - mpc ls | mpc add
+  - mpc play && mpc pause
+
+install:
+  - go get github.com/onsi/ginkgo
+  - go get github.com/onsi/gomega
+  - go get code.google.com/p/go.tools/cmd/cover
+  - go get github.com/mattn/goveralls
+  - go get github.com/axw/gocov/gocov
 
 cache: apt
+
+env:
+  global:
+    secure: Jq090gsWERlqtMuDts0mhHg8MWYbxbJP+PQ3WXcA+po01pElunu5EPvRwUqciaqTchdQ7s/QQ1Zh731ywKMqip9qVAm0da+r9bqQUqr2M9DtWH7G4e1rP/TXhEBPVC7bRiSFO1/v7UGnzF4oacSE2pVlVASaMEhH9njEEPpyq0A=
+
+script:
+  - go test -v -covermode=count -coverprofile=coverage.out
+  - $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
