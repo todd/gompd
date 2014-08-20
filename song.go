@@ -40,9 +40,9 @@ const (
 	MPD_TAG_COUNT                     = C.MPD_TAG_COUNT
 )
 
-func (song Song) GetUri() (tag string, cerr error) {
-	songTag, cerr := C.mpd_song_get_uri(song.cSong)
-	tag = C.GoString(songTag)
+func (song Song) GetUri() (uri string, cerr error) {
+	songUri, cerr := C.mpd_song_get_uri(song.cSong)
+	uri = C.GoString(songUri)
 	return
 }
 
